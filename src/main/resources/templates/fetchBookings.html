@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Fetch Bookings</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/6.1.7/fullcalendar.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+    <style>
+        .calendar-container {
+            width: 100%;
+            height: 50vh;
+            margin: 0 auto;
+            position: relative; /* Ensure calendar is positioned correctly */
+        }
+        .booking-form-container {
+            margin-bottom: 20px; /* Add margin to separate from calendar */
+            z-index: 100; /* Ensure form appears above calendar */
+            position: relative; /* Ensure form is positioned correctly */
+        }
+        .modal {
+            z-index: 1060; /* Ensure modal appears above other elements */
+        }
+        .modal-dialog {
+            max-width: 600px; /* Adjust modal width if needed */
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-4">
+        <h1 class="text-center">Meeting Room Bookings</h1>
+
+        <!-- Booking Form Modal -->
+        <div class="modal fade" id="bookingModal" tabindex="-1" aria-labelledby="bookingModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="bookingModalLabel">Book a Room</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="bookingForm" th:action="@{/bookRoom}" method="post">
+                            <div class="mb-3">
+                                <label for="roomName" class="form-label">Room Name</label>
+                                <select class="form-select" id="roomName" name="roomName" required>
+                                    <option value="Chilika">Chilika</option>
+                                    <option value="Konark">Konark</option>
+                                    <option value="Centroxy">Centroxy</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label for="bookingDateTime" class="form-label">Start Date & Time</label>
+                                <input type="datetime-local" class="form-control" id="bookingDateTime" name="bookingDateTime" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="endDateTime" class="form-label">End Date & Time</label>
+                                <input type="datetime-local" class="form-control" id="endDateTime" name="endDateTime" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="purpose" class="form-label">Purpose</label>
+                                <textarea class="form-control" id="purpose" name="purpose" required></textarea>
+                            </div>
+                            <div class="mb-3">
+                                <label for="bookedBy" class="form-label">Booked By</label>
+                                <input type="text" class="form-control" id="bookedBy" name="bookedBy" placeholder="Enter your name" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Save Booking</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Booking Details Modal -->
+        <div class="modal fade" id="eventDetailsModal" tabindex="-1" aria-labelledby="eventDetailsModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="eventDetailsModalLabel">Booking Details</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p><strong>Room Name:</strong> <span id="modalRoomName"></span></p>
+                        <p><strong>Start Date & Time:</strong> <span id="modalStartDateTime"></span></p>
+                        <p><strong>End Date & Time:</strong> <span id="modalEndDateTime"></span></p>
+                        <p><strong>Purpose:</strong> <span id="modalPurpose"></span></p>
+                        <p><strong>Booked By:</strong> <span id="modalBookedBy"></span></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Booking Form Container -->
+        <div class="booking-form-container">
+            <!-- Static form if needed -->
+        </div>
+
+        <!-- Calendar Container -->
+        <div class="calendar-container">
+            <div id="calendar"></div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.3/moment.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/6.1.7/fullcalendar.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var calendarEl = document.getElementById('calendar');
+
+            // Initialize FullCalendar
+            var calendar = new FullCalendar.Calendar(calendarEl, {
+                initialView: 'dayGridMonth',
+                headerToolbar: {
+                    left: 'prev,next today',
+                    center: 'title',
+                    right: 'dayGridMonth,timeGridWeek,timeGridDay'
+                },
+                dateClick: function(info) {
+                    // Set the default value for bookingDateTime
+                    document.getElementById("bookingDateTime").value = info.dateStr;
+                    var bookingModal = new bootstrap.Modal(document.getElementById('bookingModal'));
+                    bookingModal.show();
+                },
+                events: function(fetchInfo, successCallback, failureCallback) {
+                    fetch('/fetchBookings')
+                        .then(response => response.json())
+                        .then(data => successCallback(data))
+                        .catch(error => failureCallback(error));
+                },
+                eventClick: function(info) {
+                    // Populate modal with event details
+					document.getElementById('modalBookedBy').textContent = info.event.extendedProps.bookedBy;
+
+                    document.getElementById('modalRoomName').textContent = info.event.roomName;
+                    document.getElementById('modalStartDateTime').textContent = moment(info.event.start).format('YYYY-MM-DD HH:mm');
+                    document.getElementById('modalEndDateTime').textContent = info.event.end ? moment(info.event.end).format('YYYY-MM-DD HH:mm') : 'N/A';
+                    document.getElementById('modalPurpose').textContent = info.event.extendedProps.description;
+
+                    // Show modal instead of alert
+                    var eventDetailsModal = new bootstrap.Modal(document.getElementById('eventDetailsModal'));
+                    eventDetailsModal.show();
+                }
+            });
+
+            // Render the calendar
+            calendar.render();
+        });
+    </script>
+
+</body>
+</html>

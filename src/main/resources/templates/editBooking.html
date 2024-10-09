@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Edit Booking</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container mt-4">
+        <h2>Edit Booking</h2>
+        <form id="updateBookingForm" th:action="@{/updateBooking}" method="post">
+            <input type="hidden" name="id" th:value="${booking.id}" />
+            
+            <div class="mb-3">
+                <label for="roomName" class="form-label">Room Name</label>
+                <select class="form-select" id="roomName" name="roomName" required>
+                    <option value="Chilika" th:selected="${booking.roomName == 'Chilika'}">Chilika</option>
+                    <option value="Konark" th:selected="${booking.roomName == 'Konark'}">Konark</option>
+                    <option value="Centroxy" th:selected="${booking.roomName == 'Centroxy'}">Centroxy</option>
+                </select>
+            </div>
+
+			<div class="mb-3">
+			                            <label for="bookingDateTime" class="form-label">Start Date & Time</label>
+			                            <input type="datetime-local" class="form-control" id="bookingDateTime" name="bookingDateTime" required>
+			                        </div>
+			                        <div class="mb-3">
+			                            <label for="endDateTime" class="form-label">End Date & Time</label> <!-- Added End Date & Time -->
+			                            <input type="datetime-local" class="form-control" id="endDateTime" name="endDateTime" required>
+			                        </div>
+
+            <div class="mb-3">
+                <label for="purpose" class="form-label">Purpose</label>
+                <textarea class="form-control" id="purpose" name="purpose" required th:text="${booking.purpose}"></textarea>
+            </div>
+
+            <div class="mb-3">
+                <label for="bookedBy" class="form-label">Booked By</label>
+                <input type="text" class="form-control" id="bookedBy" name="bookedBy" placeholder="Enter your name"
+                       th:value="${booking.bookedBy}" required>
+            </div>
+
+            <button type="submit" class="btn btn-primary  w-100">Update Booking</button>
+        </form>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
