@@ -1,5 +1,5 @@
 # Build stage
-FROM maven:4.0.0-jdk-22 AS build
+FROM maven:4.0.0-jdk-17 AS build
 
 # Set the working directory
 WORKDIR /app
