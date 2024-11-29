@@ -1,5 +1,8 @@
-# Build stage
-FROM maven:4.0.0-jdk-11 AS build
+# Base image with OpenJDK 22
+FROM openjdk:22-jdk-slim AS build
+
+# Install Maven
+RUN apt-get update && apt-get install -y maven && apt-get clean
 
 # Set the working directory
 WORKDIR /app
@@ -12,7 +15,7 @@ COPY src ./src
 RUN mvn clean package -DskipTests
 
 # Package stage
-FROM openjdk:11-jdk-slim
+FROM openjdk:22-jdk-slim
 
 # Set the working directory for the final image
 WORKDIR /app
