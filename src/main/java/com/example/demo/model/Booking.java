@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 
 import org.springframework.format.annotation.DateTimeFormat;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -19,28 +20,34 @@ public class Booking implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(nullable = false) // Ensures roomName cannot be null
     private String roomName;
-    
+
     @FutureOrPresent(message = "Booking start date and time must be in the future or present.")
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+    @Column(nullable = false) // Ensures bookingDateTime cannot be null
     private LocalDateTime bookingDateTime;
-    
+
     @FutureOrPresent(message = "Booking end date and time must be in the future or present.")
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+    @Column(nullable = false) // Ensures endDateTime cannot be null
     private LocalDateTime endDateTime;
-    
+
     private String purpose;
+
     private String bookedBy;
 
-    
-
+    // Default constructor
     public Booking() {}
 
+    // Constructor with parameters
     public Booking(String roomName, LocalDateTime bookingDateTime, LocalDateTime endDateTime) {
         this.roomName = roomName;
         this.bookingDateTime = bookingDateTime;
         this.endDateTime = endDateTime;
     }
+
     // Getters and setters
     public Long getId() {
         return id;
