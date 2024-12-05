@@ -5,7 +5,20 @@ FROM openjdk:22-jdk-slim AS build
 RUN apt-get update && apt-get install -y maven && apt-get clean
 
 # Set the working directory
-WORKDIR /app
+WORKDIR /Meeting-Room-Booking                                                                                                                                                                                                                                                                    
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
 
 # Copy the pom.xml and the source code
 COPY pom.xml .
@@ -18,7 +31,9 @@ RUN mvn clean package -DskipTests
 FROM openjdk:22-jdk-slim
 
 # Set the working directory for the final image
-WORKDIR /app
+WORKDIR /Meeting-Room-Booking                                        
+  
+  
 
 # Copy the JAR file from the build stage
 COPY --from=build /app/target/Room-1-0.0.1-SNAPSHOT.jar ./Room.jar
